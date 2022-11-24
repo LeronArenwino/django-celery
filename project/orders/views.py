@@ -1,22 +1,21 @@
 from django.shortcuts import render
 from django.views.generic import ListView
+from .tasks import get_data_task
 
 import logging
-import requests
 
 from .models import Order
 
 logger = logging.getLogger(__name__)
+
+Q_RESQUEST = 100
 
 class OrderListView(ListView):
     model = Order
 
 def get_data(request):
 
-    url = 'http://universities.hipolabs.com/search'
+    for _ in range(0, Q_RESQUEST):
+        get_data_task.delay()
 
-    response = requests.get(url=url)
-    data = response.json()
-    print(data)
-
-    return render(request, 'order_request.html', {'response': data})
+    return render(request, 'orders/order_request.html', {})
